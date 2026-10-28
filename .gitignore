@@ -8,9 +8,13 @@ coverage/
 
 # Environment variables and secrets
 .env
+.envrc
 .env.*
 !.env.example
 
 # OS files
 .DS_Store
 Thumbs.db
+
+# Other
+/.direnv/
