@@ -4,24 +4,24 @@
 
 .DESCRIPTION
     各ツールのコマンドが既に使える場合は，入手元 (winget，公式インストーラー，Scoop，nvm等) に関係なくスキップします．
-
-.PARAMETER NodeCurrent
-    指定すると，Node.jsのLTS版ではなくCurrent版をインストールします．
+    Node.jsとBunは，チーム内の環境差異をなくすためにバージョンを固定してインストールします．
+    既にインストール済みのバージョンが異なる場合は，警告を表示します．
 
 .PARAMETER SkipGitConfig
     指定すると，Gitのユーザー名・メールアドレスの設定をスキップします．
 
 .EXAMPLE
     powershell -ExecutionPolicy Bypass -File .\setup.ps1
-    powershell -ExecutionPolicy Bypass -File .\setup.ps1 -NodeCurrent
 #>
 
 param(
-    [switch]$NodeCurrent,
     [switch]$SkipGitConfig
 )
 
 $ErrorActionPreference = 'Stop'
+
+$NodeVersion = '24.22.1'
+$BunVersion = '1.4.4'
 
 function Write-Step($msg) { Write-Host "`n==> $msg" -ForegroundColor Cyan }
 function Write-Ok($msg) { Write-Host "[OK] $msg" -ForegroundColor Green }
@@ -47,9 +47,17 @@ function Test-WingetInstalled($id) {
     return ($LASTEXITCODE -eq 0)
 }
 
-# wingetでパッケージをインストール
-function Install-WingetPackage($id, $name) {
-    winget install --id $id -e --source winget `
+# 先頭の v を除いてバージョンを比較
+function Test-VersionMatch($actual, $expected) {
+    return ("$actual".Trim().TrimStart('v') -eq $expected)
+}
+
+# wingetでパッケージをインストール ($versionを指定した場合はそのバージョンに固定)
+function Install-WingetPackage($id, $name, $version) {
+    $versionArgs = @()
+    if ($version) { $versionArgs = @('--version', $version) }
+
+    winget install --id $id -e --source winget @versionArgs `
         --accept-package-agreements --accept-source-agreements | Out-Host
 
     if ($LASTEXITCODE -ne 0) {
@@ -61,7 +69,7 @@ function Install-WingetPackage($id, $name) {
 }
 
 # コマンドが既にあればスキップし，なければwingetでインストール (既にあった場合は $true)
-function Install-ToolIfMissing($cmd, $id, $name, $versionArg) {
+function Install-ToolIfMissing($cmd, $id, $name, $versionArg, $version) {
     Write-Step "$name を確認します"
 
     $existing = Get-ExistingCommand $cmd
@@ -69,11 +77,14 @@ function Install-ToolIfMissing($cmd, $id, $name, $versionArg) {
         $ver = & $cmd $versionArg 2>$null
         Write-Skip "$name は既にインストールされています: $ver"
         Write-Host "場所: $($existing.Source)"
+        if ($version -and -not (Test-VersionMatch $ver $version)) {
+            Write-Warn "指定バージョン ($version) と異なります．必要に応じて入れ替えてください．"
+        }
         return $true
     }
 
-    Write-Host "$name が見つからないため，インストールします ($id)"
-    Install-WingetPackage $id $name
+    Write-Host "$name が見つからないため，インストールします ($("$id $version".Trim()))"
+    Install-WingetPackage $id $name $version
     return $false
 }
 
@@ -135,7 +146,7 @@ Update-SessionPath
 # Git + Git Bash
 $null = Install-ToolIfMissing 'git' 'Git.Git' 'Git for Windows (Git Bash)' '--version'
 
-# git.exe は通常 <Gitのルート>\cmd\git.exe または <Gitのルート>\bin\git.exe にある
+# git.exe は通常 <Gitのルート>\cmd\git.exe または <Gitのルート>\bin\git.exe に存在する
 $gitRoot = Split-Path (Split-Path (Get-ExistingCommand 'git').Source -Parent) -Parent
 if (Test-Path (Join-Path $gitRoot 'git-bash.exe')) {
     Write-Ok "Git Bash: $(Join-Path $gitRoot 'git-bash.exe')"
@@ -178,19 +189,15 @@ Write-Step 'Node.js を確認します'
 $existingNode = Get-ExistingCommand 'node'
 
 if ($existingNode) {
-    Write-Skip "Node.js は既にインストールされています: $(node -v)"
+    $nodeVer = node -v
+    Write-Skip "Node.js は既にインストールされています: $nodeVer"
     Write-Host "場所: $($existingNode.Source)"
-    if ($NodeCurrent) {
-        Write-Warn '既存のNode.jsを使用するため，-NodeCurrent は無視されます．'
+    if (-not (Test-VersionMatch $nodeVer $NodeVersion)) {
+        Write-Warn "指定バージョン (v$NodeVersion) と異なります．必要に応じて入れ替えてください．"
     }
 }
 else {
-    if ($NodeCurrent) {
-        $nodeId = 'OpenJS.NodeJS'; $nodeName = 'Node.js (Current)'; $otherId = 'OpenJS.NodeJS.LTS'
-    }
-    else {
-        $nodeId = 'OpenJS.NodeJS.LTS'; $nodeName = 'Node.js (LTS)'; $otherId = 'OpenJS.NodeJS'
-    }
+    $nodeId = 'OpenJS.NodeJS.LTS'; $nodeName = "Node.js (v$NodeVersion)"; $otherId = 'OpenJS.NodeJS'
 
     # コマンドはないがwingetには登録されている (PATHが壊れている等) 場合の二重インストール防止
     if ((Test-WingetInstalled $nodeId) -or (Test-WingetInstalled $otherId)) {
@@ -199,8 +206,8 @@ else {
         exit 1
     }
 
-    Write-Host "Node.js が見つからないため，インストールします ($nodeId)"
-    Install-WingetPackage $nodeId $nodeName
+    Write-Host "Node.js が見つからないため，インストールします ($nodeId $NodeVersion)"
+    Install-WingetPackage $nodeId $nodeName $NodeVersion
 }
 
 # npmはNode.jsに同梱
@@ -209,7 +216,7 @@ if ((Get-ExistingCommand 'node') -and -not (Get-ExistingCommand 'npm')) {
 }
 
 # Bun
-$null = Install-ToolIfMissing 'bun' 'Oven-sh.Bun' 'Bun' '--version'
+$null = Install-ToolIfMissing 'bun' 'Oven-sh.Bun' 'Bun' '--version' $BunVersion
 
 # 確認
 Write-Step 'インストール結果を確認します'
@@ -221,10 +228,22 @@ $tools = [ordered]@{
     'bun'  = { bun -v }
 }
 
+# バージョンを固定しているツール
+$expected = @{
+    'node' = $NodeVersion
+    'bun'  = $BunVersion
+}
+
 $failed = $false
 foreach ($t in $tools.GetEnumerator()) {
     if (Get-ExistingCommand $t.Key) {
-        Write-Ok ("{0,-5}: {1}" -f $t.Key, (& $t.Value))
+        $ver = & $t.Value
+        if ($expected.ContainsKey($t.Key) -and -not (Test-VersionMatch $ver $expected[$t.Key])) {
+            Write-Warn ("{0,-5}: {1} (指定: {2})" -f $t.Key, $ver, $expected[$t.Key])
+        }
+        else {
+            Write-Ok ("{0,-5}: {1}" -f $t.Key, $ver)
+        }
     }
     else {
         Write-Err "$($t.Key) が見つかりません．"
