@@ -33,6 +33,7 @@ cd 2026_PBL
 ```
 
 Git・Node.js・Bunが導入済みなら実行不要です。スクリプトはwingetを使用します。
+オプションや詳細は [setup_scripts/README.md](setup_scripts/README.md) を参照してください。
 
 **Linux / macOS（Nix利用者）**
 
