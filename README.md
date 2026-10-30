@@ -4,12 +4,14 @@
 
 目標をAIで小さなタスクに分割し、達成状況を記録・振り返るWebアプリを開発しています。
 
+Okamura-2026
+
 ## 技術構成
 
-| ディレクトリ | 技術 |
-|---|---|
-| `frontend/` | React / TypeScript / Vite / idb |
-| `backend/` | Hono / TypeScript / Bun |
+| ディレクトリ | 技術                            |
+| ------------ | ------------------------------- |
+| `frontend/`  | React / TypeScript / Vite / idb |
+| `backend/`   | Hono / TypeScript / Bun         |
 
 パッケージ管理にはBunを使用します。
 
