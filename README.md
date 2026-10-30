@@ -84,9 +84,14 @@ http://localhost:3000
 
 - `frontend/` と `backend/` は独立して依存関係を管理しています。
 - `lint`・`build` は `frontend/` で `bun run lint`・`bun run build` を実行してください。
+<<<<<<< HEAD
 - `node_modules/` や API キーなどの秘密情報は Git に追加しないでください。
 - `bun.lock` は Git で管理してください。
 
 ## お試し
 
 Yusuke_Abe398 です．よろしくお願いします．
+=======
+- `node_modules/` やAPIキーなどの秘密情報はGitに追加しないでください。
+- `bun.lock` はGitで管理してください。
+>>>>>>> b428cda815bf9304ca9c3bd827f4d42421f8f74e
