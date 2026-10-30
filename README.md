@@ -6,6 +6,7 @@
 Okamura-2026
 Yusuke
 sakata
+potato
 otonasi-muonn
 
 ## 技術構成
