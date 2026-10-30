@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.4'
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: bun install --frozen-lockfile
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: bun install --frozen-lockfile
+
+      - name: Check frontend (lint, format, build)
+        working-directory: frontend
+        run: bun run check
+
+      - name: Check backend (lint, format)
+        working-directory: backend
+        run: bun run check
