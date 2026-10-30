@@ -3,11 +3,11 @@
 プロジェクト型演習 Ⅰ Team 1 の開発用リポジトリ。
 
 目標を AI で小さなタスクに分割し、達成状況を記録・振り返る Web アプリを開発しています。
-Okamura-2026
-Yusuke
-sakata
-potato
-otonasi-muonn
+    Okamura-2026
+    Yusuke
+    sakata
+    potato
+    otonasi-muonn
 
 ## 技術構成
 
