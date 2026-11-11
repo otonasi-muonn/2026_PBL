@@ -8,6 +8,7 @@
     sakata
     potato
     otonasi-muonn
+    yukino
 
 ## 技術構成
 
