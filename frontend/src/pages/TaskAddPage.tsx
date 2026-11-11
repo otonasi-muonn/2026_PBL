@@ -1,4 +1,3 @@
-
 import { useState } from 'react'
 
 type Task = {
@@ -21,9 +20,7 @@ export default function TaskAddPage() {
       id: crypto.randomUUID(),
       title: name,
       deadline,
-      estimatedMinutes: estimatedMinutes
-        ? Number(estimatedMinutes)
-        : null,
+      estimatedMinutes: estimatedMinutes ? Number(estimatedMinutes) : null,
       completed: false,
     }))
 
@@ -52,9 +49,7 @@ export default function TaskAddPage() {
   const toggleTask = (id: string) => {
     setTasks((prev) =>
       prev.map((task) =>
-        task.id === id
-          ? { ...task, completed: !task.completed }
-          : task,
+        task.id === id ? { ...task, completed: !task.completed } : task,
       ),
     )
   }
@@ -127,9 +122,7 @@ export default function TaskAddPage() {
                   <span
                     style={{
                       marginLeft: '8px',
-                      textDecoration: task.completed
-                        ? 'line-through'
-                        : 'none',
+                      textDecoration: task.completed ? 'line-through' : 'none',
                     }}
                   >
                     {task.title}
@@ -137,7 +130,7 @@ export default function TaskAddPage() {
                 </label>
 
                 <small style={{ display: 'block', marginLeft: '24px' }}>
-                  {task.deadline && `期限：${task.deadline}　`}
+                  {task.deadline && `期限：${task.deadline}`}
                   {task.estimatedMinutes !== null &&
                     `推定：${task.estimatedMinutes}分`}
                 </small>

@@ -1,4 +1,3 @@
-
 export type Page = 'add' | 'today'
 
 type SidebarProps = {
@@ -6,10 +5,7 @@ type SidebarProps = {
   onNavigate: (page: Page) => void
 }
 
-export default function Sidebar({
-  currentPage,
-  onNavigate,
-}: SidebarProps) {
+export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
   const menu: { id: Page; label: string }[] = [
     { id: 'add', label: 'タスク追加' },
     { id: 'today', label: '今日の予定' },
@@ -33,15 +29,12 @@ export default function Sidebar({
             key={item.id}
             type="button"
             onClick={() => onNavigate(item.id)}
-            aria-current={
-              currentPage === item.id ? 'page' : undefined
-            }
+            aria-current={currentPage === item.id ? 'page' : undefined}
             style={{
               padding: '12px',
               textAlign: 'left',
               cursor: 'pointer',
-              background:
-                currentPage === item.id ? '#e0ecff' : 'transparent',
+              background: currentPage === item.id ? '#e0ecff' : 'transparent',
               color: '#222',
               border: 'none',
               borderRadius: '8px',

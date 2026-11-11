@@ -1,4 +1,3 @@
-
 import { useState } from 'react'
 import Sidebar, { type Page } from './components/Sidebar'
 import TaskAddPage from './pages/TaskAddPage'
@@ -18,14 +17,9 @@ export default function App() {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <Sidebar
-        currentPage={currentPage}
-        onNavigate={setCurrentPage}
-      />
+      <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
 
-      <div style={{ flex: 1, minWidth: 0 }}>
-        {renderPage()}
-      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>{renderPage()}</div>
     </div>
   )
 }

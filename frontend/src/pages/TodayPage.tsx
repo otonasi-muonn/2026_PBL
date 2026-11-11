@@ -1,4 +1,3 @@
-
 import { useState } from 'react'
 
 type Task = {
@@ -33,16 +32,13 @@ export default function TodayPage() {
   const [tasks, setTasks] = useState<Task[]>(sampleTasks)
 
   const completedCount = tasks.filter((task) => task.completed).length
-  const progress = tasks.length > 0
-    ? Math.round((completedCount / tasks.length) * 100)
-    : 0
+  const progress =
+    tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0
 
   const toggleTask = (id: string) => {
     setTasks((prev) =>
       prev.map((task) =>
-        task.id === id
-          ? { ...task, completed: !task.completed }
-          : task,
+        task.id === id ? { ...task, completed: !task.completed } : task,
       ),
     )
   }
@@ -98,9 +94,7 @@ export default function TodayPage() {
                   <span
                     style={{
                       flex: 1,
-                      textDecoration: task.completed
-                        ? 'line-through'
-                        : 'none',
+                      textDecoration: task.completed ? 'line-through' : 'none',
                     }}
                   >
                     {task.title}
