@@ -14,6 +14,7 @@ export default function TaskItem({ task, onToggle }: TaskItemProps) {
         checked={task.completed}
         disabled={!onToggle}
         onChange={() => onToggle?.(task.id)}
+        aria-label={`「${task.title}」の完了状態を切り替える`}
       />
       <span
         className={
