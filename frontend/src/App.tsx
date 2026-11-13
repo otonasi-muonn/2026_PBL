@@ -1,7 +1,13 @@
 import { useState } from 'react'
-import Sidebar, { type Page } from './components/Sidebar'
+import './App.css'
+import type { Page } from './types'
+import Sidebar from './components/Sidebar'
 import TaskAddPage from './pages/TaskAddPage'
 import TodayPage from './pages/TodayPage'
+import WeekPage from './pages/WeekPage'
+import CalendarPage from './pages/CalendarPage'
+import MyPage from './pages/MyPage'
+import RsesFormPage from './pages/RsesFormPage'
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('today')
@@ -12,14 +18,21 @@ export default function App() {
         return <TaskAddPage />
       case 'today':
         return <TodayPage />
+      case 'week':
+        return <WeekPage />
+      case 'calendar':
+        return <CalendarPage />
+      case 'me':
+        return <MyPage />
+      case 'rses':
+        return <RsesFormPage />
     }
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
+    <div className="app">
       <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
-
-      <div style={{ flex: 1, minWidth: 0 }}>{renderPage()}</div>
+      <div className="app-main">{renderPage()}</div>
     </div>
   )
 }
