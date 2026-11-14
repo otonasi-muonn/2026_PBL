@@ -1,0 +1,6 @@
+// Google AI Studio で各自用意したAPIキー
+LLM_API_KEY=
+// USE_MOCKは真偽値の文字列 (true/false)
+// true: LLMを呼び出さず，モックデータで動作
+// false: 実際にLLMを呼び出しを行う
+USE_MOCK=
