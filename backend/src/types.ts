@@ -15,5 +15,7 @@ export type Env = { Bindings: Bindings }
 
 // servicesのenv引数 (必要な値だけ)
 export type LlmEnv = Pick<Bindings, 'LLM_API_KEY' | 'LLM_BASE_URL'>
-export type SplitEnv = LlmEnv & Pick<Bindings, 'SPLIT_MODEL' | 'SPLIT_FALLBACK_MODEL'>
-export type PraiseEnv = LlmEnv & Pick<Bindings, 'PRAISE_MODEL' | 'PRAISE_FALLBACK_MODEL'>
+export type SplitEnv = LlmEnv &
+  Pick<Bindings, 'SPLIT_MODEL' | 'SPLIT_FALLBACK_MODEL'>
+export type PraiseEnv = LlmEnv &
+  Pick<Bindings, 'PRAISE_MODEL' | 'PRAISE_FALLBACK_MODEL'>
