@@ -1,16 +1,17 @@
 export type Bindings = {
-  LLM_API_KEY: string // secret
-  LLM_BASE_URL: string
+  LLM_API_KEY: string // .dev.vars
+  LLM_BASE_URL: string // vars: 末尾の / は不必要
   SPLIT_MODEL: string // vars: ミドルモデル
   PRAISE_MODEL: string // vars: ライトモデル
   ALLOWED_ORIGIN: string // vars
-  // TODO: Rate Limiting binding を wrangler.jsonc に追加したら有効化する
+  USE_MOCK: string // デフォルトは true だが，明示する場合は .dev.vars から
+  // TODO: Rate Limiting binding を wrangler.jsonc に追加したら有効化
   // RATE_LIMITER: RateLimit
 }
 
 export type Env = { Bindings: Bindings }
 
-// services の env 引数 (必要な値だけ)
+// servicesのenv引数 (必要な値だけ)
 export type LlmEnv = Pick<Bindings, 'LLM_API_KEY' | 'LLM_BASE_URL'>
 export type SplitEnv = LlmEnv & Pick<Bindings, 'SPLIT_MODEL'>
 export type PraiseEnv = LlmEnv & Pick<Bindings, 'PRAISE_MODEL'>
