@@ -11,8 +11,11 @@
   "vars": {
     // OpenAI互換
     "LLM_BASE_URL": "https://generativelanguage.googleapis.com/v1beta/openai",
+    // MEMO: 2026/11/14 時点で提供されているモデル
     "SPLIT_MODEL": "gemini-3.8-flash", // ミドルモデル
     "PRAISE_MODEL": "gemini-3.5-flash-lite", // ライトモデル
+    "SPLIT_FALLBACK_MODEL": "gemini-3.6-flash",
+    "PRAISE_FALLBACK_MODEL": "gemini-3.1-flash-lite",
     "USE_MOCK": "true", // デフォルトの "true" ならモック，それ以外なら LLM (.dev.vars で上書き)
   },
   // "kv_namespaces": [
