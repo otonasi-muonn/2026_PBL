@@ -6,9 +6,15 @@
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],
-  // "vars": {
-  //   "MY_VAR": "my-variable"
-  // },
+
+  // 参考: https://aistudio.google.com/docs/models
+  "vars": {
+    // OpenAI互換
+    "LLM_BASE_URL": "https://generativelanguage.googleapis.com/v1beta/openai",
+    "SPLIT_MODEL": "gemini-3.8-flash", // ミドルモデル
+    "PRAISE_MODEL": "gemini-3.5-flash-lite", // ライトモデル
+    "USE_MOCK": "true", // デフォルトの "true" ならモック，それ以外なら LLM (.dev.vars で上書き)
+  },
   // "kv_namespaces": [
   //   {
   //     "binding": "MY_KV_NAMESPACE",
