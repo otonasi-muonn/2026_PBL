@@ -19,7 +19,8 @@ const generatePraise = factory.createHandlers(
   }),
   async (c) => {
     const input = c.req.valid('json')
-    console.log('get:', input)
+    return c.json({ message: input.taskTitle })
+    // console.log('get:', input)
     // ダミーの返却値を返す（テスト用）
     return c.json({ message: 'よく頑張りました！ (仮)' })
   },
