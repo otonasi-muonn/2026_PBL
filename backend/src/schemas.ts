@@ -13,11 +13,11 @@ export const praiseInputSchema = z.object({
     .min(1, 'taskTitle は 1~100 文字で入力してください')
     .max(100, 'taskTitle は 1~100 文字で入力してください'),
 
-  parentTitile: z
+  parentTitle: z
     .string()
     .trim()
-    .min(1, 'parentTitile は 1~100 文字で入力してください')
-    .max(100, 'parentTitile は 1~100 文字で入力してください')
+    .min(1, 'parentTitle は 1~100 文字で入力してください')
+    .max(100, 'parentTitle は 1~100 文字で入力してください')
     .optional(),
 
   // デフォルトで gentle にする
