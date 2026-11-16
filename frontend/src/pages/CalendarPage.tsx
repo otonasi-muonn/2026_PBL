@@ -25,7 +25,9 @@ export default function CalendarPage() {
   const [selectedDay, setSelectedDay] = useState<number | null>(today.getDate())
   const year = displayMonth.getFullYear()
   const month = displayMonth.getMonth()
+  // 1日の前に入れる空きマスの数（月曜始まり。getDay() は日曜=0）
   const firstDayOffset = (displayMonth.getDay() + 6) % 7
+  // 翌月の「0日」は今月の末日になる
   const daysInMonth = new Date(year, month + 1, 0).getDate()
   const selectedDate =
     selectedDay === null ? null : new Date(year, month, selectedDay)

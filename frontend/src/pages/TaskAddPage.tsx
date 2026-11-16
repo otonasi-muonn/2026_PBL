@@ -30,6 +30,7 @@ export default function TaskAddPage() {
   const [estimatedMinutes, setEstimatedMinutes] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editingTitle, setEditingTitle] = useState('')
+  // 画面に表示しない連番なので、state ではなく ref で持つ
   const nextId = useRef(1)
 
   function addTask(isDemo: boolean) {
@@ -109,10 +110,10 @@ export default function TaskAddPage() {
               <button
                 type="submit"
                 className="ui-button task-add-small-button"
-                aria-label={`「${task.title}」の変更を保存`}
+                aria-label={`「${task.title}」の変更を決定`}
                 disabled={!editingTitle.trim()}
               >
-                保存
+                決定
               </button>
               <button
                 type="button"
@@ -199,7 +200,7 @@ export default function TaskAddPage() {
         <p className="ui-note">
           モック画面です。追加したタスクはこの画面の中だけで表示され、保存はされません。今日・今週・カレンダーの画面にも反映されません。
         </p>
-        <div className="task-add-row task-add-entry">
+        <div className="task-add-row">
           <input
             className="ui-input task-add-entry-input"
             aria-label="タスク・目標"

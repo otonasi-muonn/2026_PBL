@@ -17,6 +17,7 @@ export default function WeekPage() {
   const monday = new Date(
     today.getFullYear(),
     today.getMonth(),
+    // getDay() は日曜=0。月曜=0 になるよう変換して、今週の月曜を求める
     today.getDate() - ((today.getDay() + 6) % 7),
   )
 

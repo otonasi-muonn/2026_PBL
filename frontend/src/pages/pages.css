@@ -1,5 +1,6 @@
 /* ページ専用スタイル（TaskAdd / Week / Calendar / MyPage / アンケート）。
-   TodayPage・Sidebar には影響させないため、接頭辞付きクラスのみを使う。 */
+   TodayPage・Sidebar には影響させないため、接頭辞付きクラスのみを使う。
+   .ui-* は上の5ページの中だけで使う（色の変数を各ページのルートクラスに定義しているため）。 */
 
 /* 共通 */
 .task-add-page,
@@ -12,6 +13,7 @@
   --ui-panel: #f7fafc;
   --ui-muted: #5f6b73;
   --ui-avatar: #297399;
+  overflow-wrap: anywhere;
 }
 
 .ui-note {
@@ -22,7 +24,6 @@
   background: var(--ui-panel);
   color: var(--ui-muted);
   font-size: 0.875rem;
-  overflow-wrap: anywhere;
 }
 
 .ui-pill {
@@ -84,11 +85,6 @@
 }
 
 /* TaskAdd */
-.task-add-page {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
 .task-add-header {
   display: flex;
   align-items: flex-start;
@@ -171,7 +167,6 @@
 .task-add-title {
   flex: 1 1 180px;
   min-width: 0;
-  overflow-wrap: anywhere;
 }
 
 .task-add-actions {
@@ -214,11 +209,6 @@
 }
 
 /* Week */
-.week-page {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
 .week-grid,
 .week-tasks {
   margin: 0;
@@ -228,8 +218,9 @@
 
 .week-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(7, minmax(96px, 1fr));
   gap: 10px;
+  overflow-x: auto;
 }
 
 .week-column {
@@ -258,7 +249,6 @@
   border-radius: 6px;
   padding: 10px;
   font-size: 0.875rem;
-  overflow-wrap: anywhere;
 }
 
 .week-empty {
@@ -267,6 +257,10 @@
 }
 
 @media (max-width: 700px) {
+  .week-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .week-column {
     min-height: auto;
   }
@@ -274,9 +268,7 @@
 
 /* Calendar */
 .calendar-page {
-  min-width: 0;
   max-width: 760px;
-  overflow-wrap: anywhere;
 }
 
 .calendar-toolbar {
@@ -319,9 +311,8 @@
   text-align: left;
 }
 
-.calendar-day[aria-pressed='true'] {
-  background: var(--ui-fill);
-  color: var(--ui-line);
+.calendar-day[aria-pressed='true'] .calendar-dot {
+  background: #fff;
 }
 
 .calendar-day[aria-current='date'] {
@@ -360,9 +351,7 @@
 
 /* MyPage */
 .my-page {
-  min-width: 0;
   max-width: 880px;
-  overflow-wrap: anywhere;
 }
 
 .my-page-profile {
@@ -457,9 +446,7 @@
 
 /* アンケート */
 .rses-page {
-  min-width: 0;
   max-width: 760px;
-  overflow-wrap: anywhere;
 }
 
 .rses-question {
