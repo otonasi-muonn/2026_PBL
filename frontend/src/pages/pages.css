@@ -357,3 +357,165 @@
     padding: 4px;
   }
 }
+
+/* MyPage */
+.my-page {
+  min-width: 0;
+  max-width: 880px;
+  overflow-wrap: anywhere;
+}
+
+.my-page-profile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+  gap: 12px;
+}
+
+.my-page-avatar {
+  display: flex;
+  flex: 0 0 64px;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--ui-avatar);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.my-page-name {
+  min-width: 0;
+  border-radius: 6px;
+  padding: 8px 16px;
+}
+
+.my-page-caption {
+  color: var(--ui-muted);
+  font-size: 0.875rem;
+}
+
+.my-page-section {
+  margin: 24px 0;
+}
+
+.my-page-heading {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+}
+
+.my-page-praise {
+  padding: 28px 20px;
+  text-align: center;
+}
+
+.my-page-praise-text {
+  margin: 16px 0 24px;
+  color: var(--ui-muted);
+  line-height: 1.8;
+}
+
+.my-page-rating-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.my-page-rating-button {
+  border-radius: 999px;
+}
+
+.my-page-history {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: 12px;
+  list-style: none;
+}
+
+.my-page-history-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+}
+
+.my-page-task-title {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+
+.my-page-memo {
+  width: 100%;
+  resize: vertical;
+}
+
+/* アンケート */
+.rses-page {
+  min-width: 0;
+  max-width: 760px;
+  overflow-wrap: anywhere;
+}
+
+.rses-question {
+  min-width: 0;
+  margin: 0 0 12px;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.rses-legend {
+  max-width: 100%;
+  font-weight: 700;
+}
+
+.rses-options,
+.rses-actions {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  gap: 8px;
+}
+
+.rses-option {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  gap: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.rses-option:has(.rses-radio:checked) {
+  background: var(--ui-fill);
+  font-weight: 700;
+}
+
+.rses-radio {
+  flex-shrink: 0;
+  margin: 0;
+  accent-color: var(--ui-line);
+}
+
+.rses-progress {
+  font-weight: 700;
+}
+
+.rses-help {
+  color: var(--ui-muted);
+  font-size: 0.875rem;
+}
+
+.rses-result {
+  margin-top: 24px;
+}
+
+.rses-result-heading {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
