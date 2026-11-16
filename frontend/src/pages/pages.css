@@ -1,0 +1,214 @@
+/* ページ専用スタイル（TaskAdd / Week / Calendar / MyPage / アンケート）。
+   TodayPage・Sidebar には影響させないため、接頭辞付きクラスのみを使う。 */
+
+/* 共通 */
+.task-add-page,
+.week-page,
+.calendar-page,
+.my-page,
+.rses-page {
+  --ui-line: #1c546e;
+  --ui-fill: #ebf5fa;
+  --ui-panel: #f7fafc;
+  --ui-muted: #5f6b73;
+  --ui-avatar: #297399;
+}
+
+.ui-note {
+  margin: 16px 0;
+  border: 1px dashed var(--ui-line);
+  border-radius: 6px;
+  padding: 12px;
+  background: var(--ui-panel);
+  color: var(--ui-muted);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.ui-pill {
+  border: 1.5px solid var(--ui-line);
+  border-radius: 999px;
+  padding: 2px 12px;
+  background: var(--ui-fill);
+  color: var(--ui-line);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.ui-button {
+  border: 1.5px solid var(--ui-line);
+  border-radius: 6px;
+  padding: 6px 12px;
+  background: #fff;
+  color: var(--ui-line);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.ui-button:hover:not(:disabled):not([aria-pressed='true']) {
+  background: var(--ui-fill);
+}
+
+.ui-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ui-button[aria-pressed='true'] {
+  background: var(--ui-line);
+  color: #fff;
+}
+
+.ui-button-strong {
+  background: var(--ui-fill);
+  font-weight: 700;
+}
+
+.ui-input {
+  min-width: 0;
+  max-width: 100%;
+  border: 1.5px solid var(--ui-line);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+
+.ui-box {
+  border: 2px solid var(--ui-line);
+  border-radius: 10px;
+  padding: 16px;
+  background: #fff;
+}
+
+/* TaskAdd */
+.task-add-page {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.task-add-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.task-add-fields {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+.task-add-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  gap: 12px;
+}
+
+.task-add-field-label {
+  min-width: 0;
+  font-size: 0.875rem;
+}
+
+.task-add-meta-input {
+  width: 176px;
+}
+
+.task-add-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+  border: 2px solid var(--ui-line);
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: #fff;
+}
+
+.task-add-entry-input {
+  flex: 1 1 240px;
+}
+
+.task-add-help,
+.task-add-empty {
+  color: var(--ui-muted);
+  font-size: 0.875rem;
+}
+
+.task-add-help {
+  margin: 8px 0 24px;
+}
+
+.task-add-section-title {
+  font-size: 1.1rem;
+}
+
+.task-add-list,
+.task-add-subtasks {
+  display: grid;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  gap: 10px;
+  list-style: none;
+}
+
+.task-add-group {
+  min-width: 0;
+}
+
+.task-add-subtasks {
+  margin-top: 10px;
+  margin-left: 32px;
+}
+
+.task-add-title {
+  flex: 1 1 180px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.task-add-actions {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  gap: 6px;
+}
+
+.task-add-small-button {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+}
+
+.task-add-edit-form {
+  display: flex;
+  flex: 1 1 240px;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+}
+
+.task-add-edit-input {
+  flex: 1 1 160px;
+}
+
+@media (max-width: 700px) {
+  .task-add-header {
+    flex-wrap: wrap;
+  }
+
+  .task-add-fields {
+    width: 100%;
+  }
+
+  .task-add-subtasks {
+    margin-left: 16px;
+  }
+}
