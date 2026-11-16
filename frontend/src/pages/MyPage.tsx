@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './pages.css'
+import './MyPage.css'
 
 // 褒め言葉の内容に対する評価（利用者自身の能力や達成度の評価ではない）
 const RATINGS = ['悪い', '普通', '良い']

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './pages.css'
+import './WeekPage.css'
 
 // 月曜〜日曜のダミータスク（画面確認用。どの週も同じ内容を表示する）
 const WEEK_TASKS = [

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './pages.css'
+import './CalendarPage.css'
 
 const WEEKDAYS = ['月', '火', '水', '木', '金', '土', '日']
 

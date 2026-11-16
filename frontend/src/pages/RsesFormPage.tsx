@@ -3,7 +3,7 @@
 // （9項目、RSESとは別の尺度）を転用したりしないこと。
 
 import { useState } from 'react'
-import './pages.css'
+import './RsesFormPage.css'
 
 const QUESTION_COUNT = 10
 // ワイヤーの「4段階」に合わせた仮置き。正式な回答方式は未決定。

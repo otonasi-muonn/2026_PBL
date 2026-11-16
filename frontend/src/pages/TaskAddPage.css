@@ -1,0 +1,129 @@
+/* タスク追加画面（TaskAddPage）専用のスタイル。クラス名は task-add- で始める。
+   共通の部品（.ui-*）は App.css、配色（--ui-*）は index.css にある。 */
+
+.task-add-page {
+  overflow-wrap: anywhere;
+}
+
+.task-add-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.task-add-fields {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+.task-add-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  gap: 12px;
+}
+
+.task-add-field-label {
+  min-width: 0;
+  font-size: 0.875rem;
+}
+
+.task-add-meta-input {
+  width: 176px;
+}
+
+.task-add-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+  border: 2px solid var(--ui-line);
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: #fff;
+}
+
+.task-add-entry-input {
+  flex: 1 1 240px;
+}
+
+.task-add-help,
+.task-add-empty {
+  color: var(--ui-muted);
+  font-size: 0.875rem;
+}
+
+.task-add-help {
+  margin: 8px 0 24px;
+}
+
+.task-add-section-title {
+  font-size: 1.1rem;
+}
+
+.task-add-list,
+.task-add-subtasks {
+  display: grid;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  gap: 10px;
+  list-style: none;
+}
+
+.task-add-group {
+  min-width: 0;
+}
+
+.task-add-subtasks {
+  margin-top: 10px;
+  margin-left: 32px;
+}
+
+.task-add-title {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.task-add-actions {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  gap: 6px;
+}
+
+.task-add-small-button {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+}
+
+.task-add-edit-form {
+  display: flex;
+  flex: 1 1 240px;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+}
+
+.task-add-edit-input {
+  flex: 1 1 160px;
+}
+
+@media (max-width: 700px) {
+  .task-add-header {
+    flex-wrap: wrap;
+  }
+
+  .task-add-fields {
+    width: 100%;
+  }
+
+  .task-add-subtasks {
+    margin-left: 16px;
+  }
+}

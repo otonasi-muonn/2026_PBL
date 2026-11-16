@@ -1,0 +1,65 @@
+/* アンケート画面（RsesFormPage）専用のスタイル。クラス名は rses- で始める。
+   共通の部品（.ui-*）は App.css、配色（--ui-*）は index.css にある。 */
+
+.rses-page {
+  max-width: 760px;
+  overflow-wrap: anywhere;
+}
+
+.rses-question {
+  min-width: 0;
+  margin: 0 0 12px;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.rses-legend {
+  max-width: 100%;
+  font-weight: 700;
+}
+
+.rses-options,
+.rses-actions {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  gap: 8px;
+}
+
+.rses-option {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  gap: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.rses-option:has(.rses-radio:checked) {
+  background: var(--ui-fill);
+  font-weight: 700;
+}
+
+.rses-radio {
+  flex-shrink: 0;
+  margin: 0;
+  accent-color: var(--ui-line);
+}
+
+.rses-progress {
+  font-weight: 700;
+}
+
+.rses-help {
+  color: var(--ui-muted);
+  font-size: 0.875rem;
+}
+
+.rses-result {
+  margin-top: 24px;
+}
+
+.rses-result-heading {
+  margin-top: 0;
+  font-size: 1.1rem;
+}

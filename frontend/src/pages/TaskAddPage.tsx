@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import './pages.css'
+import './TaskAddPage.css'
 
 // この画面だけで使う仮のデータ（保存しない）
 type DraftTask = {
