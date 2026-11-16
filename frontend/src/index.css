@@ -3,6 +3,13 @@
   --text: #1f2937;
   --border: #e5e7eb;
   --accent: #2563eb;
+
+  /* 画面設計の配色（App.css の .ui-* と各ページのCSSで使う） */
+  --ui-line: #1c546e; /* 枠線・強調文字 */
+  --ui-fill: #ebf5fa; /* ピル・強調ボタン・選択中の背景 */
+  --ui-panel: #f7fafc; /* 列・注記の背景 */
+  --ui-muted: #5f6b73; /* 補足文字 */
+  --ui-avatar: #297399; /* アバター・小さな印 */
 }
 
 * {

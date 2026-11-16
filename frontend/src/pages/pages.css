@@ -1,6 +1,6 @@
 /* ページ専用スタイル（TaskAdd / Week / Calendar / MyPage / アンケート）。
    TodayPage・Sidebar には影響させないため、接頭辞付きクラスのみを使う。
-   .ui-* は上の5ページの中だけで使う（色の変数を各ページのルートクラスに定義しているため）。 */
+   共通の部品（.ui-*）は App.css、配色（--ui-*）は index.css にある。 */
 
 /* 共通 */
 .task-add-page,
@@ -8,80 +8,7 @@
 .calendar-page,
 .my-page,
 .rses-page {
-  --ui-line: #1c546e;
-  --ui-fill: #ebf5fa;
-  --ui-panel: #f7fafc;
-  --ui-muted: #5f6b73;
-  --ui-avatar: #297399;
   overflow-wrap: anywhere;
-}
-
-.ui-note {
-  margin: 16px 0;
-  border: 1px dashed var(--ui-line);
-  border-radius: 6px;
-  padding: 12px;
-  background: var(--ui-panel);
-  color: var(--ui-muted);
-  font-size: 0.875rem;
-}
-
-.ui-pill {
-  border: 1.5px solid var(--ui-line);
-  border-radius: 999px;
-  padding: 2px 12px;
-  background: var(--ui-fill);
-  color: var(--ui-line);
-  font-size: 0.85rem;
-  white-space: nowrap;
-}
-
-.ui-button {
-  border: 1.5px solid var(--ui-line);
-  border-radius: 6px;
-  padding: 6px 12px;
-  background: #fff;
-  color: var(--ui-line);
-  font: inherit;
-  font-size: 0.875rem;
-  cursor: pointer;
-}
-
-.ui-button:hover:not(:disabled):not([aria-pressed='true']) {
-  background: var(--ui-fill);
-}
-
-.ui-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.ui-button[aria-pressed='true'] {
-  background: var(--ui-line);
-  color: #fff;
-}
-
-.ui-button-strong {
-  background: var(--ui-fill);
-  font-weight: 700;
-}
-
-.ui-input {
-  min-width: 0;
-  max-width: 100%;
-  border: 1.5px solid var(--ui-line);
-  border-radius: 6px;
-  padding: 8px 10px;
-  background: #fff;
-  color: inherit;
-  font: inherit;
-}
-
-.ui-box {
-  border: 2px solid var(--ui-line);
-  border-radius: 10px;
-  padding: 16px;
-  background: #fff;
 }
 
 /* TaskAdd */
