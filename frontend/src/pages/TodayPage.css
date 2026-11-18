@@ -1,0 +1,178 @@
+/* 今日の予定画面（TodayPage）専用のスタイル。クラス名は today- で始める。
+   共通の部品（.ui-*）は App.css、配色（--ui-*）は index.css にある。
+   行の枠（.ui-box）とピル（.ui-pill）は共通部品を使い、写真のモックに合わせる。 */
+
+.today-progress {
+  margin-top: 16px;
+}
+
+.today-progress-text {
+  margin: 0 0 8px;
+}
+
+.today-progress-track {
+  height: 10px;
+  border: 1.5px solid var(--ui-line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.today-progress-fill {
+  height: 100%;
+  background: var(--ui-line);
+  transition: width 0.3s ease;
+}
+
+.today-list {
+  display: grid;
+  gap: 16px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.today-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.today-row-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* 四角の当たり判定。四角そのものより広い 40px 四方を押せるようにし、
+   レイアウトが広がらないよう margin で打ち消す */
+.today-checkbox-hit {
+  display: grid;
+  place-content: center;
+  width: 40px;
+  height: 40px;
+  margin: -8px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.today-checkbox-hit:hover .today-checkbox {
+  background: var(--ui-fill);
+}
+
+/* 写真の四角いチェックボックス */
+.today-checkbox {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  border: 2px solid var(--ui-line);
+  border-radius: 5px;
+  background: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: grid;
+  place-content: center;
+}
+
+.today-checkbox::after {
+  content: '✓';
+  color: var(--ui-line);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0;
+}
+
+.today-checkbox:checked {
+  background: var(--ui-fill);
+}
+
+.today-checkbox:checked::after {
+  opacity: 1;
+}
+
+.today-checkbox:focus-visible {
+  outline: 2px solid var(--ui-line);
+  outline-offset: 2px;
+}
+
+.today-expand {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  color: var(--text);
+  font-size: 0.95rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.today-title {
+  font-size: 1.05rem;
+}
+
+.today-title.completed {
+  text-decoration: line-through;
+  color: var(--ui-muted);
+}
+
+.today-pill {
+  margin-left: auto;
+  min-width: 120px;
+  padding: 6px 12px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.today-menu-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.today-menu-button {
+  background: transparent;
+  border: none;
+  padding: 4px 10px;
+  color: var(--text);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.today-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 10;
+  min-width: 96px;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  border: 1.5px solid var(--ui-line);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.today-menu-item {
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 8px;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.today-menu-item:hover {
+  background: var(--ui-fill);
+}
+
+.today-detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-left: 38px;
+  color: var(--ui-muted);
+  font-size: 0.9rem;
+}
