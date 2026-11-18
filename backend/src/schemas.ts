@@ -48,7 +48,7 @@ export const praiseOutputSchema = z.object({
 
 // タスク分割のスキーマ定義
 
-// TODO: splitInputSchema
+// TODO: splitInputSchema1
 
 // サブタスク1件分
 export const subtaskSchema = z.object({
