@@ -5,13 +5,30 @@ import type { Env } from './types'
 // LLM関連のエラーコード
 export type LlmErrorCode = 'LLM_ERROR' | 'LLM_TIMEOUT'
 
+// LLMが混雑・レート制限のときに返す HTTP ステータス (別モデルなら通る可能性あり)
+const OVERLOADED_STATUSES: readonly number[] = [429, 503]
+
 export class LlmError extends Error {
   readonly code: LlmErrorCode
+  // LLMが返したHTTPステータス (HTTPエラー以外ではundefined)
+  readonly status?: number
 
-  constructor(code: LlmErrorCode, message: string, options?: ErrorOptions) {
+  constructor(
+    code: LlmErrorCode,
+    message: string,
+    options?: ErrorOptions & { status?: number },
+  ) {
     super(message, options)
     this.name = 'LlmError'
     this.code = code
+    this.status = options?.status
+  }
+
+  // LLM側の混雑・レート制限による失敗か
+  get isOverloaded(): boolean {
+    return (
+      this.status !== undefined && OVERLOADED_STATUSES.includes(this.status)
+    )
   }
 }
 
