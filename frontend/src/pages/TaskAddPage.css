@@ -21,7 +21,7 @@
 .task-add-field {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   min-width: 0;
   gap: 12px;
 }

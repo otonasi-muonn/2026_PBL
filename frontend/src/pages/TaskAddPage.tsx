@@ -7,14 +7,13 @@ type DraftTask = {
   parentId: number | null // null なら親タスク
   title: string
   deadline: string // 'YYYY-MM-DD'、'' は未設定
-  estimatedMinutes: number | null
   isDemo: boolean // AI分割（デモ）で作った親タスク
 }
 
 const DEMO_SUBTASKS = [
-  { title: '取りかかる準備をする', estimatedMinutes: 10 },
-  { title: '15分だけ進めてみる', estimatedMinutes: 15 },
-  { title: '進んだところを確かめる', estimatedMinutes: 5 },
+  { title: '取りかかる準備をする' },
+  { title: '15分だけ進めてみる' },
+  { title: '進んだところを確かめる' },
 ]
 
 function formatDeadline(deadline: string) {
@@ -27,9 +26,6 @@ export default function TaskAddPage() {
   const [tasks, setTasks] = useState<DraftTask[]>([])
   const [title, setTitle] = useState('')
   const [deadline, setDeadline] = useState('')
-  const [estimatedMinutes, setEstimatedMinutes] = useState('')
-  const [minutesError, setMinutesError] = useState(false)
-  const minutesInputRef = useRef<HTMLInputElement>(null)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editingTitle, setEditingTitle] = useState('')
   // 画面に表示しない連番なので、state ではなく ref で持つ
@@ -41,20 +37,12 @@ export default function TaskAddPage() {
 
     // 推定時間は任意。入力するなら1以上の数だけ受け付け、小数は四捨五入する。
     // 数として読めない入力は value が '' になるため、badInput で空欄と区別する。
-    const isMinutesEmpty =
-      estimatedMinutes === '' && !minutesInputRef.current?.validity.badInput
-    const minutes = Number(estimatedMinutes)
-    const isMinutesValid =
-      isMinutesEmpty || (Number.isFinite(minutes) && minutes >= 1)
-    setMinutesError(!isMinutesValid)
-    if (!isMinutesValid) return
 
     const parent: DraftTask = {
       id: nextId.current++,
       parentId: null,
       title: trimmedTitle,
       deadline,
-      estimatedMinutes: isMinutesEmpty ? null : Math.round(minutes),
       isDemo,
     }
     const children: DraftTask[] = isDemo
@@ -70,7 +58,6 @@ export default function TaskAddPage() {
     setTasks((current) => [...current, parent, ...children])
     setTitle('')
     setDeadline('')
-    setEstimatedMinutes('')
   }
 
   function cancelEdit() {
@@ -139,9 +126,6 @@ export default function TaskAddPage() {
           <span className="task-add-title">{task.title}</span>
         )}
         {task.isDemo && <span className="ui-pill">AI分割デモ</span>}
-        {task.estimatedMinutes !== null && (
-          <span className="ui-pill">~{task.estimatedMinutes}分</span>
-        )}
         {task.deadline && (
           <span className="ui-pill">{formatDeadline(task.deadline)}</span>
         )}
@@ -193,39 +177,6 @@ export default function TaskAddPage() {
                 onChange={(event) => setDeadline(event.target.value)}
               />
             </label>
-            <label className="task-add-field">
-              <span className="task-add-field-label">推定時間（分）</span>
-              <input
-                ref={minutesInputRef}
-                type="number"
-                min="1"
-                step="any"
-                placeholder="例: 30"
-                className="ui-input task-add-meta-input"
-                value={estimatedMinutes}
-                aria-invalid={minutesError}
-                aria-describedby={
-                  minutesError
-                    ? 'task-add-minutes-hint task-add-minutes-error'
-                    : 'task-add-minutes-hint'
-                }
-                onChange={(event) => setEstimatedMinutes(event.target.value)}
-                // 数として読めない入力では onChange が呼ばれないことがあるため、onInput でエラーを消す
-                onInput={() => setMinutesError(false)}
-              />
-            </label>
-            <span id="task-add-minutes-hint" className="task-add-field-label">
-              1以上の数（小数は四捨五入）
-            </span>
-            {minutesError && (
-              <strong
-                id="task-add-minutes-error"
-                className="task-add-field-label"
-                role="alert"
-              >
-                推定時間は1以上の数で入力してください
-              </strong>
-            )}
           </div>
         </div>
         <p className="ui-note">
