@@ -26,14 +26,6 @@ function toDateKey(date: Date): string {
   return `${date.getFullYear()}-${month}-${day}`
 }
 
-// 30 -> '~30m' / 60 -> '~1h' / 90 -> '~1h30m'（モックの ~m(h) 表記）
-function formatEstimated(minutes: number): string {
-  if (minutes < 60) return `~${minutes}m`
-  const hours = Math.floor(minutes / 60)
-  const rest = minutes % 60
-  return rest === 0 ? `~${hours}h` : `~${hours}h${rest}m`
-}
-
 // '2026-11-17' -> '11/17(火)'（モックの xx/yy(z) 表記）
 function formatDeadline(deadline: string): string {
   const date = new Date(`${deadline}T00:00:00`)
@@ -137,11 +129,7 @@ function TaskRow({ task, onToggle, onEdit, onDelete }: TaskRowProps) {
         >
           {task.title}
         </span>
-        {task.estimatedMinutes !== null && (
-          <span className="ui-pill today-pill">
-            {formatEstimated(task.estimatedMinutes)}
-          </span>
-        )}
+
         <div className="today-menu-wrap">
           <button
             type="button"
@@ -217,9 +205,6 @@ export default function TodayPage() {
     todayTasks.length === 0
       ? 0
       : Math.round((completedCount / todayTasks.length) * 100)
-  const remainingMinutes = todayTasks
-    .filter((task) => !task.completed)
-    .reduce((sum, task) => sum + (task.estimatedMinutes ?? 0), 0)
 
   const handleToggle = (id: string) => {
     const target = todayTasks.find((task) => task.id === id)
@@ -269,9 +254,6 @@ export default function TodayPage() {
       <div className="today-progress">
         <p className="today-progress-text">
           進捗: {completedCount} / {todayTasks.length} 件完了（{progress}%）
-          {remainingMinutes > 0 && (
-            <> ・ 残りの目安 {formatEstimated(remainingMinutes)}</>
-          )}
         </p>
         <div
           className="today-progress-track"
