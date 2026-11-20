@@ -175,9 +175,7 @@ function TaskRow({ task, onToggle, onEdit, onDelete }: TaskRowProps) {
           {task.deadline !== '' && (
             <span>締切: {formatDeadline(task.deadline)}</span>
           )}
-          {task.estimatedMinutes !== null && (
-            <span>目安: {task.estimatedMinutes}分</span>
-          )}
+
           <span>{task.completed ? '完了済み' : '未完了'}</span>
         </div>
       )}

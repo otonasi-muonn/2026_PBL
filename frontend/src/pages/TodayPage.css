@@ -115,17 +115,10 @@
   color: var(--ui-muted);
 }
 
-.today-pill {
-  margin-left: auto;
-  min-width: 120px;
-  padding: 6px 12px;
-  text-align: center;
-  font-size: 0.95rem;
-}
-
 .today-menu-wrap {
   position: relative;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .today-menu-button {

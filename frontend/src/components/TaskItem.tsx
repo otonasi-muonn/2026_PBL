@@ -23,9 +23,6 @@ export default function TaskItem({ task, onToggle }: TaskItemProps) {
       >
         {task.title}
       </span>
-      {task.estimatedMinutes !== null && (
-        <span className="task-item-meta">{task.estimatedMinutes}分</span>
-      )}
       {task.deadline !== '' && (
         <span className="task-item-meta">締切: {task.deadline}</span>
       )}
