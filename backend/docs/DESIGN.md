@@ -45,7 +45,9 @@ backend/
 │   │   └── praise.ts          # POST /api/praise
 │   └── services/              # プロンプト組立 -> LLM 呼び出し -> パース -> 結果検証
 │       ├── splitTask.ts       # 失敗時は例外を投げる (フォールバックはクライアント側)
-│       └── generatePraise.ts  # 同上
+│       ├── generatePraise.ts  # 同上
+│       ├── mockSplitTask.ts   # splitTask のモック (MOCK_LLM_ERROR / MOCK_LLM_TIMEOUT でエラーを再現)
+│       └── mockGeneratePraise.ts # generatePraise のモック (同上)
 ├── eval/                      # 評価セット (開発時のLLM選択テスト用)
 │   ├── models.json            # 比較するモデルの一覧
 │   ├── splitCases.json        # 分割の入力 (タイトル・本文) と期待条件 (サブタスク数の範囲)
