@@ -3,6 +3,7 @@ import { createFactory } from 'hono/factory'
 import type { Env } from '../types'
 import { jsonValidator } from '../validator'
 import { praiseInputSchema } from '../schemas'
+import { mockGeneratePraise } from '../services/mockGeneratePraise'
 
 const praise = new Hono<Env>()
 const factory = createFactory<Env>()
@@ -12,8 +13,8 @@ const generatePraise = factory.createHandlers(
   jsonValidator(praiseInputSchema),
   async (c) => {
     const input = c.req.valid('json')
-    // オウム返しでダミーの返却値を返す（テスト用）
-    return c.json({ message: input.taskTitle })
+    const result = await mockGeneratePraise(input)
+    return c.json(result)
   },
 )
 
