@@ -1,4 +1,3 @@
-// src/services/mockGeneratePraise.ts (概略)
 import { LlmError } from '../errors'
 import {
   praiseOutputSchema,
@@ -16,16 +15,13 @@ const PRAISE_TEMPLATES: Record<Tone, (taskTitle: string) => string> = {
 export async function mockGeneratePraise(
   input: PraiseInput,
 ): Promise<PraiseOutput> {
-  // 特定の入力でエラーを再現する (フロントエンドのフォールバック確認・テスト用)
   if (input.taskTitle === 'MOCK_LLM_ERROR') {
     throw new LlmError('LLM_ERROR', 'mock error')
   }
-  // MOCK_LLM_TIMEOUT も同様に (フロントエンドのフォールバック確認・テスト用)
   if (input.taskTitle === 'MOCK_LLM_TIMEOUT') {
     throw new LlmError('LLM_TIMEOUT', 'mock timeout')
   }
 
   const message = PRAISE_TEMPLATES[input.tone](input.taskTitle)
-  // 自分で書いたデータでも，API の約束 (スキーマ) を守っているか確認する
   return praiseOutputSchema.parse({ message })
 }
