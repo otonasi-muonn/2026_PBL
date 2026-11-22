@@ -9,7 +9,7 @@ const praise = new Hono<Env>()
 const factory = createFactory<Env>()
 
 // POST /api/praise
-const generatePraise = factory.createHandlers(
+const praiseHandlers = factory.createHandlers(
   jsonValidator(praiseInputSchema),
   async (c) => {
     const input = c.req.valid('json')
@@ -18,6 +18,6 @@ const generatePraise = factory.createHandlers(
   },
 )
 
-praise.post('/', ...generatePraise)
+praise.post('/', ...praiseHandlers)
 
 export default praise

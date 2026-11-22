@@ -9,7 +9,7 @@ const tasks = new Hono<Env>()
 const factory = createFactory<Env>()
 
 // POST /api/tasks/split
-const splitTask = factory.createHandlers(
+const splitHandlers = factory.createHandlers(
   jsonValidator(splitInputSchema),
   async (c) => {
     const input = c.req.valid('json')
@@ -18,6 +18,6 @@ const splitTask = factory.createHandlers(
   },
 )
 
-tasks.post('/split', ...splitTask)
+tasks.post('/split', ...splitHandlers)
 
 export default tasks
