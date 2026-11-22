@@ -4,6 +4,7 @@ import type { Env } from '../types'
 import { jsonValidator } from '../validator'
 import { praiseInputSchema } from '../schemas'
 import { mockGeneratePraise } from '../services/mockGeneratePraise'
+import { generatePraise } from '../services/generatePraise'
 
 const praise = new Hono<Env>()
 const factory = createFactory<Env>()
@@ -13,7 +14,10 @@ const praiseHandlers = factory.createHandlers(
   jsonValidator(praiseInputSchema),
   async (c) => {
     const input = c.req.valid('json')
-    const result = await mockGeneratePraise(input)
+    const result =
+      c.env.USE_MOCK === 'true'
+        ? await mockGeneratePraise(input)
+        : await generatePraise(input, c.env)
     return c.json(result)
   },
 )
