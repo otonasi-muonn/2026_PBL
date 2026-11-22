@@ -32,8 +32,23 @@ export class LlmError extends Error {
   }
 }
 
+// 入力検証エラー (メッセージをそのままクライアントに返してよいもの)
+export class InvalidInputError extends Error {
+  constructor(message: string, options?: ErrorOptions) {
+    super(message, options)
+    this.name = 'InvalidInputError'
+  }
+}
+
 export const errorHandler: ErrorHandler<Env> = (err, c) => {
-  // LLM 関連のエラーハンドリング
+  if (err instanceof InvalidInputError) {
+    return c.json(
+      { error: { code: 'INVALID_INPUT', message: err.message } },
+      400,
+    )
+  }
+
+  // LLM関連のエラーハンドリング
   if (err instanceof LlmError) {
     console.error(err)
 
@@ -61,12 +76,19 @@ export const errorHandler: ErrorHandler<Env> = (err, c) => {
     }
   }
 
-  // HTTP サーバー側のエラーハンドリング
+  // HTTPサーバー側のエラーハンドリング
   if (err instanceof HTTPException) {
     switch (err.status) {
       case 400:
+        // ライブラリ由来 (壊れたJSONなど) は英語のため返さず，固定メッセージにする
+        console.warn(err.message)
         return c.json(
-          { error: { code: 'INVALID_INPUT', message: err.message } },
+          {
+            error: {
+              code: 'INVALID_INPUT',
+              message: 'リクエストの形式が不正です',
+            },
+          },
           400,
         )
       case 413:
