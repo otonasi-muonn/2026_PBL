@@ -23,24 +23,6 @@ function normalizeLine(line: string): string {
     .trim()
 }
 
-const segmenter = new Intl.Segmenter('ja', { granularity: 'grapheme' })
-
-/**
- * ## 文字の途中で切らずに `max` 以内へ切り詰める
- *
- * - 長さは zod の `.max()` と同じく UTF-16 の長さ (`String.length`) で数える
- * - 書記素 (絵文字・結合文字など見た目の1文字) の途中では切らない．収まらない書記素は丸ごと落とす
- */
-function truncate(s: string, max: number): string {
-  if (s.length <= max) return s
-  let out = ''
-  for (const { segment } of segmenter.segment(s)) {
-    if (out.length + segment.length > max) break
-    out += segment
-  }
-  return out
-}
-
 /**
  * ## LLMのテキストをパースし，構造化されたデータに変換する
  *
@@ -63,17 +45,30 @@ export function parseSplitOutput(text: string): SplitOutput {
     // それ以外の行は無視
   }
 
-  const valid = subtasks
-    .filter((s) => s.title !== '') // 空タイトルを先に捨てる
-    .slice(0, MAX_SUBTASK) // その後で先頭5件にする
-    .map((s) => ({
-      title: truncate(s.title, MAX_TITLE),
-      description: truncate(s.description, MAX_DESC),
-    }))
+  const valid = subtasks.filter((s) => s.title !== '') // 空タイトルを捨ててから件数を数える
 
   // 有効なサブタスクが2件未満
   if (valid.length < 2) {
     throw new LlmError('LLM_ERROR', 'Not enough valid subtasks')
+  }
+
+  // 件数・文字数の超過は切り詰めずに `LlmError` (分割が崩れている・途中で切れた文は不自然なため，フォールバックさせる)
+  if (valid.length > MAX_SUBTASK) {
+    throw new LlmError('LLM_ERROR', `Subtasks exceed ${MAX_SUBTASK} items`)
+  }
+
+  // 長さはzodの `.max()` と同じくUTF-16の長さ (`String.length`) で数える
+  if (valid.some((s) => s.title.length > MAX_TITLE)) {
+    throw new LlmError(
+      'LLM_ERROR',
+      `Subtask title exceeds ${MAX_TITLE} characters`,
+    )
+  }
+  if (valid.some((s) => s.description.length > MAX_DESC)) {
+    throw new LlmError(
+      'LLM_ERROR',
+      `Subtask description exceeds ${MAX_DESC} characters`,
+    )
   }
 
   const result = splitOutputSchema.safeParse({ subtasks: valid })
