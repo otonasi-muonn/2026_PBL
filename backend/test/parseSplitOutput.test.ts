@@ -109,49 +109,40 @@ describe('parseSplitOutput', () => {
       })
     })
 
-    test('6件なら先頭5件にする', () => {
-      const text = lines(
-        ...['A', 'B', 'C', 'D', 'E', 'F'].map((t) => `TITLE: ${t}`),
-      )
+    test('ちょうど5件は通す', () => {
+      const text = lines(...['A', 'B', 'C', 'D', 'E'].map((t) => `TITLE: ${t}`))
       const { subtasks } = parseSplitOutput(text)
       expect(subtasks.map((s) => s.title)).toEqual(['A', 'B', 'C', 'D', 'E'])
     })
 
-    test('空タイトルを捨ててから先頭5件にする', () => {
+    test('空タイトルを捨ててから件数を数える (5件 + 空1件は通す)', () => {
       const text = lines(
         'TITLE: A',
         'TITLE:',
-        ...['B', 'C', 'D', 'E', 'F'].map((t) => `TITLE: ${t}`),
+        ...['B', 'C', 'D', 'E'].map((t) => `TITLE: ${t}`),
       )
       const { subtasks } = parseSplitOutput(text)
       expect(subtasks.map((s) => s.title)).toEqual(['A', 'B', 'C', 'D', 'E'])
     })
 
-    test('タイトル120文字は100文字に切り詰める', () => {
-      const text = lines(`TITLE: ${'あ'.repeat(120)}`, 'TITLE: B')
+    test('タイトルちょうど100文字は通す', () => {
+      const text = lines(`TITLE: ${'あ'.repeat(100)}`, 'TITLE: B')
       expect(parseSplitOutput(text).subtasks[0].title).toBe('あ'.repeat(100))
     })
 
-    test('説明600文字は500文字に切り詰める', () => {
-      const text = lines('TITLE: A', `DESC: ${'あ'.repeat(600)}`, 'TITLE: B')
+    test('説明ちょうど500文字は通す', () => {
+      const text = lines('TITLE: A', `DESC: ${'あ'.repeat(500)}`, 'TITLE: B')
       expect(parseSplitOutput(text).subtasks[0].description).toBe(
         'あ'.repeat(500),
       )
     })
 
-    test('切り詰めでサロゲートペアの途中では切らない', () => {
-      // 99 文字 + 😀 (UTF-16 で 2) = 101 → 😀 を丸ごと落として 99
-      const text = lines(`TITLE: ${'a'.repeat(99)}😀`, 'TITLE: B')
-      expect(parseSplitOutput(text).subtasks[0].title).toBe('a'.repeat(99))
+    test('前後の空白は文字数に含めない', () => {
+      const text = lines(`TITLE:   ${'あ'.repeat(100)}   `, 'TITLE: B')
+      expect(parseSplitOutput(text).subtasks[0].title).toBe('あ'.repeat(100))
     })
 
-    test('切り詰めで結合絵文字 (ZWJ) の途中では切らない', () => {
-      const family = '👨‍👩‍👧' // UTF-16 で 8
-      const text = lines(`TITLE: ${'a'.repeat(95)}${family}`, 'TITLE: B')
-      expect(parseSplitOutput(text).subtasks[0].title).toBe('a'.repeat(95))
-    })
-
-    test('収まる絵文字はそのまま残す', () => {
+    test('上限に収まる絵文字はそのまま残す', () => {
       const text = lines(`TITLE: ${'a'.repeat(98)}😀`, 'TITLE: B')
       expect(parseSplitOutput(text).subtasks[0].title).toBe(
         `${'a'.repeat(98)}😀`,
@@ -216,6 +207,30 @@ describe('parseSplitOutput', () => {
       ['有効なサブタスクが 1 件', 'TITLE: A'],
       ['#9 3 件中 2 件が空タイトル', lines('TITLE: A', 'TITLE:', 'TITLE:   ')],
       ['DESC のみ', lines('DESC: a', 'DESC: b')],
+      [
+        '#7 6 件',
+        lines(...['A', 'B', 'C', 'D', 'E', 'F'].map((t) => `TITLE: ${t}`)),
+      ],
+      [
+        '空タイトルを捨てても 6 件',
+        lines(
+          'TITLE:',
+          ...['A', 'B', 'C', 'D', 'E', 'F'].map((t) => `TITLE: ${t}`),
+        ),
+      ],
+      ['#8 タイトル 120 文字', lines(`TITLE: ${'あ'.repeat(120)}`, 'TITLE: B')],
+      [
+        '2 件目のタイトル 101 文字',
+        lines('TITLE: A', `TITLE: ${'あ'.repeat(101)}`),
+      ],
+      [
+        'タイトルがサロゲートペア込みで UTF-16 長 101',
+        lines(`TITLE: ${'a'.repeat(99)}😀`, 'TITLE: B'),
+      ],
+      [
+        '説明 501 文字',
+        lines('TITLE: A', `DESC: ${'あ'.repeat(501)}`, 'TITLE: B'),
+      ],
     ])('%s なら LLM_ERROR', (_label, input) => {
       expectLlmError(input)
     })
