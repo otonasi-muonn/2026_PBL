@@ -114,6 +114,12 @@ export async function callWithFallback(
   let lastError: unknown
 
   for (const [i, model] of models.entries()) {
+    // モデルフォールバックが発火した際にログを出す
+    if (i > 0) {
+      console.log(
+        `LLM fallback: switching model from ${models[i - 1]} to ${model}`,
+      )
+    }
     const laterAttempts = (models.length - 1 - i) * MAX_TIMEOUTS_BEFORE_FALLBACK
 
     for (let attempt = 1; attempt <= MAX_TIMEOUTS_BEFORE_FALLBACK; attempt++) {
