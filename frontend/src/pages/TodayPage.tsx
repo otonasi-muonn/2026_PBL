@@ -10,7 +10,7 @@ import './TodayPage.css'
 
 const PARENT_TITLE = '卒業研究の中間発表スライドを作る'
 const STORAGE_KEY = 'pbl.todayTasks.v1'
-const PRAISE_TIMEOUT_MS = 8000
+const PRAISE_TIMEOUT_MS = 15000
 const FALLBACK_PRAISE = [
   '一歩ずつ着実に進んでいますね。その調子です！',
   'よく頑張りました！今日の積み重ねが確実に力になっています。',
