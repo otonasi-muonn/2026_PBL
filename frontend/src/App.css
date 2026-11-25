@@ -13,6 +13,44 @@
   gap: 12px;
 }
 
+/* サイドバー上部のプロフィール（マイページのプロフィール表示とまったく同じ
+   部品・クラスを使い、全体をマイページへのボタンにしている。
+   ボタンのデフォルトの灰色背景・枠は消す） */
+.sidebar-profile {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* サイドバーでは名前を丸の横に1行で置き、入らない分は … で省略する */
+.sidebar-profile.my-page-profile {
+  flex-wrap: nowrap;
+}
+
+.sidebar-profile .my-page-name {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-profile:hover {
+  filter: brightness(1.05);
+}
+
+.sidebar-profile.active {
+  outline: 2px solid var(--ui-line);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
 .sidebar-nav,
 .sidebar-sub {
   display: flex;

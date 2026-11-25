@@ -7,7 +7,7 @@ type SidebarProps = {
 
 const MAIN_MENU_ITEMS: { page: Page; label: string }[] = [
   { page: 'add', label: 'タスク追加' },
-  { page: 'today', label: '今日の予定' },
+  { page: 'today', label: '今日のタスク' },
   { page: 'week', label: '今週の予定' },
   { page: 'calendar', label: 'カレンダー' },
 ]
@@ -15,6 +15,19 @@ const MAIN_MENU_ITEMS: { page: Page; label: string }[] = [
 export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
   return (
     <aside className="sidebar">
+      <button
+        type="button"
+        className="my-page-profile sidebar-profile"
+        aria-label="マイページへ"
+        aria-current={currentPage === 'me' ? 'page' : undefined}
+        onClick={() => onNavigate('me')}
+      >
+        <span className="my-page-avatar" aria-hidden="true">
+          サ
+        </span>
+        <span className="ui-box my-page-name">サンプルユーザー</span>
+      </button>
+
       <nav className="sidebar-nav">
         {MAIN_MENU_ITEMS.map((item) => {
           const isActive = currentPage === item.page
