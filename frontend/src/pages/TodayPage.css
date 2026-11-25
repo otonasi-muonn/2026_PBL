@@ -115,57 +115,112 @@
   color: var(--ui-muted);
 }
 
-.today-menu-wrap {
-  position: relative;
-  flex-shrink: 0;
-  margin-left: auto;
-}
-
-.today-menu-button {
-  background: transparent;
-  border: none;
-  padding: 4px 10px;
-  color: var(--text);
-  font-size: 1.1rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.today-menu {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 4px);
-  z-index: 10;
-  min-width: 96px;
+/* インライン編集（TaskAddPage の編集フォームと同じ形） */
+.today-edit-form {
   display: flex;
-  flex-direction: column;
-  padding: 4px;
-  border: 1.5px solid var(--ui-line);
-  border-radius: 6px;
-  background: #fff;
+  flex: 1 1 240px;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
 }
 
-.today-menu-item {
-  background: transparent;
-  border: none;
-  border-radius: 4px;
-  padding: 6px 8px;
-  color: var(--text);
-  font: inherit;
-  font-size: 0.9rem;
-  text-align: left;
-  cursor: pointer;
+.today-edit-input {
+  flex: 1 1 160px;
 }
 
-.today-menu-item:hover {
-  background: var(--ui-fill);
+.today-actions {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  gap: 6px;
+}
+
+.today-small-button {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+}
+
+.today-row-actions {
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .today-detail {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 16px;
   padding-left: 38px;
+  color: var(--ui-muted);
+  font-size: 0.9rem;
+}
+
+.today-deadline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* タスク追加画面の日付入力と同じ幅・見た目（カレンダーマーク付き） */
+.today-deadline-input {
+  width: 176px;
+}
+
+/* AI分割した小タスクは ▼ の詳細の中、締め切りの下に、
+   タスク追加画面の小タスク行と同じ「枠付き＋インデント」で並べる */
+.today-subtasks {
+  flex-basis: 100%;
+  display: grid;
+  gap: 10px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.today-subtask {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: 28px;
+  border: 2px solid var(--ui-line);
+  border-radius: 10px;
+  background: #fff;
+  padding: 10px 14px;
+}
+
+.today-subtask .today-title {
+  color: var(--text);
+  /* タイトル側を伸ばして、ボタン群を右端に押し出す（右寄せの保険） */
+  flex: 1;
+}
+
+/* 小タスク行の編集・削除ボタンは右端に寄せる */
+.today-subtask-actions {
+  margin-left: auto;
+}
+
+/* 「手動で追加」は締切の行の右端（親タスクの削除ボタンの真下）に置く */
+.today-manual-add {
+  margin-left: auto;
+}
+
+/* 手動で追加の入力欄は詳細の幅いっぱいに広げる */
+.today-add-form {
+  flex-basis: 100%;
+}
+
+/* コンソールを使わずに初期状態へ戻すボタン（画面下部） */
+.today-reset-area {
+  margin-top: 24px;
+}
+
+.today-reset-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
   color: var(--ui-muted);
   font-size: 0.9rem;
 }

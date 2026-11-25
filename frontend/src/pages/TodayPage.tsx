@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Task } from '../types'
 import PraiseModal from '../components/PraiseModal'
 import './TodayPage.css'
@@ -9,6 +9,12 @@ import './TodayPage.css'
 // localStorage に保存し、節目（20%ごと・5件ごと）で褒めモーダルを出す。
 
 const PARENT_TITLE = '卒業研究の中間発表スライドを作る'
+// AI分割（デモ）のサンプル小タスク。TaskAddPage と同じ内容・同じ並び。
+const DEMO_SUBTASKS = [
+  '取りかかる準備をする',
+  '15分だけ進めてみる',
+  '進んだところを確かめる',
+]
 const STORAGE_KEY = 'pbl.todayTasks.v1'
 const PRAISE_TIMEOUT_MS = 15000
 const FALLBACK_PRAISE = [
@@ -18,19 +24,10 @@ const FALLBACK_PRAISE = [
   'お疲れさまです。ここまで進められたのは立派な成果です。',
 ]
 
-const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土']
-
 function toDateKey(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${date.getFullYear()}-${month}-${day}`
-}
-
-// '2026-11-17' -> '11/17(火)'（モックの xx/yy(z) 表記）
-function formatDeadline(deadline: string): string {
-  const date = new Date(`${deadline}T00:00:00`)
-  if (Number.isNaN(date.getTime())) return deadline
-  return `${date.getMonth() + 1}/${date.getDate()}(${WEEKDAYS[date.getDay()]})`
 }
 
 function createInitialTasks(todayKey: string): Task[] {
@@ -51,9 +48,12 @@ function createInitialTasks(todayKey: string): Task[] {
   }))
 }
 
-type StoredTasks = { date: string; tasks: Task[] }
+// TodayPage の中だけで使う形: AI分割した小タスクを ▼ の詳細にぶら下げる
+type TodayTask = Task & { subtasks?: Task[] }
 
-function loadInitialTasks(todayKey: string): Task[] {
+type StoredTasks = { date: string; tasks: TodayTask[] }
+
+function loadInitialTasks(todayKey: string): TodayTask[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
@@ -93,15 +93,97 @@ async function fetchPraise(taskTitle: string): Promise<string> {
 }
 
 type TaskRowProps = {
-  task: Task
+  task: TodayTask
+  isEditing: boolean
+  editingTitle: string
   onToggle: (id: string) => void
-  onEdit: (id: string) => void
+  onEditStart: (id: string) => void
+  onEditChange: (title: string) => void
+  onEditSave: () => void
+  onEditCancel: () => void
   onDelete: (id: string) => void
+  onDeadlineChange: (id: string, deadline: string) => void
+  onSplit: (id: string) => void
+  onSubtaskToggle: (parentId: string, subtaskId: string) => void
+  onSubtaskRename: (parentId: string, subtaskId: string, title: string) => void
+  onSubtaskDelete: (parentId: string, subtaskId: string) => void
+  onSubtaskAdd: (parentId: string, title: string) => void
 }
 
-function TaskRow({ task, onToggle, onEdit, onDelete }: TaskRowProps) {
+function TaskRow({
+  task,
+  isEditing,
+  editingTitle,
+  onToggle,
+  onEditStart,
+  onEditChange,
+  onEditSave,
+  onEditCancel,
+  onDelete,
+  onDeadlineChange,
+  onSplit,
+  onSubtaskToggle,
+  onSubtaskRename,
+  onSubtaskDelete,
+  onSubtaskAdd,
+}: TaskRowProps) {
   const [expanded, setExpanded] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
+  // 小タスクのインライン編集は行の中で完結させる
+  const [editingSubtaskId, setEditingSubtaskId] = useState<string | null>(null)
+  const [editingSubtaskTitle, setEditingSubtaskTitle] = useState('')
+  // 「手動で追加」の入力欄も行の中で完結させる
+  const [isAddingSubtask, setIsAddingSubtask] = useState(false)
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState('')
+
+  const submitSubtaskAdd = () => {
+    const title = newSubtaskTitle.trim()
+    if (title === '') return
+    onSubtaskAdd(task.id, title)
+    setNewSubtaskTitle('')
+    setIsAddingSubtask(false)
+  }
+
+  // 親タスクの一覧と同じく、完了した小タスクは下に下げる
+  const displaySubtasks = [...(task.subtasks ?? [])].sort(
+    (a, b) => Number(a.completed) - Number(b.completed),
+  )
+
+  // 分割で小タスクが増えたら、結果が見えるよう自動で詳細を開く
+  const subtaskCount = task.subtasks?.length ?? 0
+  const prevSubtaskCount = useRef(subtaskCount)
+  useEffect(() => {
+    if (subtaskCount > prevSubtaskCount.current) setExpanded(true)
+    prevSubtaskCount.current = subtaskCount
+  }, [subtaskCount])
+
+  // 締切は入力の途中では反映しない。日付の入力欄は、年の途中で打っただけでも
+  // 途中経過の値を返してくる（例: 2026 の「2」→ 0002-11-24）ため、そのまま
+  // 反映するとタスクが今日の一覧から消えてしまう。フォーカスが外れるか
+  // Enter を押した時点で、完全な日付になっている場合だけ反映する。
+  const [deadlineDraft, setDeadlineDraft] = useState<string | null>(null)
+
+  const commitDeadline = () => {
+    if (deadlineDraft === null) return
+    setDeadlineDraft(null)
+    if (
+      /^\d{4}-\d{2}-\d{2}$/.test(deadlineDraft) &&
+      deadlineDraft !== task.deadline
+    ) {
+      onDeadlineChange(task.id, deadlineDraft)
+    }
+  }
+
+  const startSubtaskEdit = (subtask: Task) => {
+    setEditingSubtaskId(subtask.id)
+    setEditingSubtaskTitle(subtask.title)
+  }
+
+  const saveSubtaskEdit = () => {
+    const title = editingSubtaskTitle.trim()
+    if (editingSubtaskId === null || title === '') return
+    onSubtaskRename(task.id, editingSubtaskId, title)
+    setEditingSubtaskId(null)
+  }
 
   return (
     <li className="ui-box today-row">
@@ -124,59 +206,230 @@ function TaskRow({ task, onToggle, onEdit, onDelete }: TaskRowProps) {
         >
           {expanded ? '▲' : '▼'}
         </button>
-        <span
-          className={task.completed ? 'today-title completed' : 'today-title'}
-        >
-          {task.title}
-        </span>
-
-        <div className="today-menu-wrap">
-          <button
-            type="button"
-            className="today-menu-button"
-            aria-haspopup="menu"
-            aria-expanded={menuOpen}
-            aria-label={`「${task.title}」のメニュー`}
-            onClick={() => setMenuOpen((prev) => !prev)}
+        {isEditing ? (
+          <form
+            className="today-edit-form"
+            onSubmit={(event) => {
+              event.preventDefault()
+              onEditSave()
+            }}
           >
-            …
-          </button>
-          {menuOpen && (
-            <div className="today-menu" role="menu">
+            <input
+              className="ui-input today-edit-input"
+              aria-label="タスク名を編集"
+              value={editingTitle}
+              onChange={(event) => onEditChange(event.target.value)}
+              autoFocus
+            />
+            <div className="today-actions">
+              <button
+                type="submit"
+                className="ui-button today-small-button"
+                aria-label={`「${task.title}」の変更を決定`}
+                disabled={!editingTitle.trim()}
+              >
+                決定
+              </button>
               <button
                 type="button"
-                role="menuitem"
-                className="today-menu-item"
-                onClick={() => {
-                  setMenuOpen(false)
-                  onEdit(task.id)
-                }}
+                className="ui-button today-small-button"
+                aria-label={`「${task.title}」の編集をキャンセル`}
+                onClick={onEditCancel}
+              >
+                キャンセル
+              </button>
+            </div>
+          </form>
+        ) : (
+          <>
+            <span
+              className={
+                task.completed ? 'today-title completed' : 'today-title'
+              }
+            >
+              {task.title}
+            </span>
+
+            <div className="today-actions today-row-actions">
+              <button
+                type="button"
+                className="ui-button ui-button-strong today-small-button"
+                aria-label={`「${task.title}」をAI分割（デモ）`}
+                onClick={() => onSplit(task.id)}
+              >
+                AI分割（デモ）
+              </button>
+              <button
+                type="button"
+                className="ui-button today-small-button"
+                aria-label={`「${task.title}」を編集`}
+                onClick={() => onEditStart(task.id)}
               >
                 編集
               </button>
               <button
                 type="button"
-                role="menuitem"
-                className="today-menu-item"
-                onClick={() => {
-                  setMenuOpen(false)
-                  onDelete(task.id)
-                }}
+                className="ui-button today-small-button"
+                aria-label={`「${task.title}」を削除`}
+                onClick={() => onDelete(task.id)}
               >
                 削除
               </button>
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
 
       {expanded && (
         <div className="today-detail">
-          {task.deadline !== '' && (
-            <span>締切: {formatDeadline(task.deadline)}</span>
+          <label className="today-deadline">
+            締切:
+            <input
+              type="date"
+              className="ui-input today-deadline-input"
+              value={deadlineDraft ?? task.deadline}
+              aria-label={`「${task.title}」の締め切り`}
+              onChange={(event) => setDeadlineDraft(event.target.value)}
+              onBlur={commitDeadline}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  commitDeadline()
+                  event.currentTarget.blur()
+                }
+              }}
+            />
+          </label>
+
+          <span>親タスク</span>
+
+          <button
+            type="button"
+            className="ui-button today-small-button today-manual-add"
+            aria-label={`「${task.title}」に小タスクを手動で追加`}
+            onClick={() => setIsAddingSubtask(true)}
+          >
+            手動で追加
+          </button>
+
+          {isAddingSubtask && (
+            <form
+              className="today-edit-form today-add-form"
+              onSubmit={(e) => {
+                e.preventDefault()
+                submitSubtaskAdd()
+              }}
+            >
+              <input
+                className="ui-input today-edit-input"
+                value={newSubtaskTitle}
+                onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                placeholder="小タスクを入力"
+                aria-label="追加する小タスクのタイトル"
+                autoFocus
+              />
+              <div className="today-actions">
+                <button
+                  type="submit"
+                  className="ui-button today-small-button"
+                  disabled={newSubtaskTitle.trim() === ''}
+                >
+                  追加
+                </button>
+                <button
+                  type="button"
+                  className="ui-button today-small-button"
+                  onClick={() => {
+                    setIsAddingSubtask(false)
+                    setNewSubtaskTitle('')
+                  }}
+                >
+                  キャンセル
+                </button>
+              </div>
+            </form>
           )}
 
-          <span>{task.completed ? '完了済み' : '未完了'}</span>
+          {task.subtasks && task.subtasks.length > 0 && (
+            <ul className="today-subtasks">
+              {displaySubtasks.map((subtask) => (
+                <li key={subtask.id} className="today-subtask">
+                  <label className="today-checkbox-hit">
+                    <input
+                      type="checkbox"
+                      className="today-checkbox"
+                      checked={subtask.completed}
+                      onChange={() => onSubtaskToggle(task.id, subtask.id)}
+                      aria-label={`「${subtask.title}」の完了状態を切り替える`}
+                    />
+                  </label>
+
+                  {editingSubtaskId === subtask.id ? (
+                    <form
+                      className="today-edit-form"
+                      onSubmit={(e) => {
+                        e.preventDefault()
+                        saveSubtaskEdit()
+                      }}
+                    >
+                      <input
+                        className="ui-input today-edit-input"
+                        value={editingSubtaskTitle}
+                        onChange={(e) => setEditingSubtaskTitle(e.target.value)}
+                        aria-label="小タスクのタイトル"
+                        autoFocus
+                      />
+                      <div className="today-actions">
+                        <button
+                          type="submit"
+                          className="ui-button today-small-button"
+                          disabled={editingSubtaskTitle.trim() === ''}
+                        >
+                          決定
+                        </button>
+                        <button
+                          type="button"
+                          className="ui-button today-small-button"
+                          onClick={() => setEditingSubtaskId(null)}
+                        >
+                          キャンセル
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      <span
+                        className={
+                          subtask.completed
+                            ? 'today-title completed'
+                            : 'today-title'
+                        }
+                      >
+                        {subtask.title}
+                      </span>
+                      <div className="today-actions today-subtask-actions">
+                        <button
+                          type="button"
+                          className="ui-button today-small-button"
+                          aria-label={`「${subtask.title}」を編集`}
+                          onClick={() => startSubtaskEdit(subtask)}
+                        >
+                          編集
+                        </button>
+                        <button
+                          type="button"
+                          className="ui-button today-small-button"
+                          aria-label={`「${subtask.title}」を削除`}
+                          onClick={() => onSubtaskDelete(task.id, subtask.id)}
+                        >
+                          削除
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
     </li>
@@ -185,8 +438,13 @@ function TaskRow({ task, onToggle, onEdit, onDelete }: TaskRowProps) {
 
 export default function TodayPage() {
   const todayKey = toDateKey(new Date())
-  const [tasks, setTasks] = useState<Task[]>(() => loadInitialTasks(todayKey))
+  const [tasks, setTasks] = useState<TodayTask[]>(() =>
+    loadInitialTasks(todayKey),
+  )
   const [praiseMessage, setPraiseMessage] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingTitle, setEditingTitle] = useState('')
+  const [confirmingReset, setConfirmingReset] = useState(false)
 
   useEffect(() => {
     try {
@@ -198,6 +456,10 @@ export default function TodayPage() {
   }, [tasks, todayKey])
 
   const todayTasks = tasks.filter((task) => task.deadline === todayKey)
+  // 完了したタスクは下に下げる（同じ状態どうしの並びは元の順序を保つ）
+  const displayTasks = [...todayTasks].sort(
+    (a, b) => Number(a.completed) - Number(b.completed),
+  )
   const completedCount = todayTasks.filter((task) => task.completed).length
   const progress =
     todayTasks.length === 0
@@ -228,26 +490,141 @@ export default function TodayPage() {
     }
   }
 
-  const handleEdit = (id: string) => {
+  // 編集の流れは TaskAddPage と同じ: 編集 → 入力欄＋決定/キャンセル
+  const startEdit = (id: string) => {
     const target = todayTasks.find((task) => task.id === id)
     if (!target) return
-    // TODO: 正式な編集画面が決まるまでの暫定実装
-    const title = window.prompt('タスク名を編集', target.title)
-    if (title === null || title.trim() === '') return
+    setEditingId(id)
+    setEditingTitle(target.title)
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setEditingTitle('')
+  }
+
+  const saveEdit = () => {
+    const trimmedTitle = editingTitle.trim()
+    if (!trimmedTitle || editingId === null) return
     setTasks((prev) =>
       prev.map((task) =>
-        task.id === id ? { ...task, title: title.trim() } : task,
+        task.id === editingId ? { ...task, title: trimmedTitle } : task,
       ),
     )
+    cancelEdit()
   }
 
   const handleDelete = (id: string) => {
     setTasks((prev) => prev.filter((task) => task.id !== id))
+    if (editingId === id) cancelEdit()
+  }
+
+  const handleDeadlineChange = (id: string, deadline: string) => {
+    setTasks((prev) =>
+      prev.map((task) => (task.id === id ? { ...task, deadline } : task)),
+    )
+  }
+
+  // AI分割（デモ）: TaskAddPage と同じサンプル小タスクを、そのタスクの
+  // ▼ 詳細の中にぶら下げる（行としては増やさない）
+  const handleSplit = (id: string) => {
+    setTasks((prev) =>
+      prev.map((task) => {
+        if (task.id !== id) return task
+        const stamp = Date.now()
+        const newSubtasks: Task[] = DEMO_SUBTASKS.map((title, i) => ({
+          id: `${task.id}-demo-${stamp}-${i}`,
+          title,
+          deadline: task.deadline,
+          estimatedMinutes: null,
+          completed: false,
+        }))
+        return {
+          ...task,
+          subtasks: [...(task.subtasks ?? []), ...newSubtasks],
+        }
+      }),
+    )
+  }
+
+  const handleSubtaskRename = (
+    parentId: string,
+    subtaskId: string,
+    title: string,
+  ) => {
+    setTasks((prev) =>
+      prev.map((task) => {
+        if (task.id !== parentId || !task.subtasks) return task
+        return {
+          ...task,
+          subtasks: task.subtasks.map((subtask) =>
+            subtask.id === subtaskId ? { ...subtask, title } : subtask,
+          ),
+        }
+      }),
+    )
+  }
+
+  const handleSubtaskDelete = (parentId: string, subtaskId: string) => {
+    setTasks((prev) =>
+      prev.map((task) => {
+        if (task.id !== parentId || !task.subtasks) return task
+        return {
+          ...task,
+          subtasks: task.subtasks.filter((subtask) => subtask.id !== subtaskId),
+        }
+      }),
+    )
+  }
+
+  // 手動で追加: 分割した小タスクと同じ場所（そのタスクの詳細の中）に入れる
+  const handleSubtaskAdd = (parentId: string, title: string) => {
+    setTasks((prev) =>
+      prev.map((task) => {
+        if (task.id !== parentId) return task
+        const newSubtask: Task = {
+          id: `${task.id}-manual-${Date.now()}`,
+          title,
+          deadline: task.deadline,
+          estimatedMinutes: null,
+          completed: false,
+        }
+        return {
+          ...task,
+          subtasks: [...(task.subtasks ?? []), newSubtask],
+        }
+      }),
+    )
+  }
+
+  const handleSubtaskToggle = (parentId: string, subtaskId: string) => {
+    setTasks((prev) =>
+      prev.map((task) => {
+        if (task.id !== parentId || !task.subtasks) return task
+        return {
+          ...task,
+          subtasks: task.subtasks.map((subtask) =>
+            subtask.id === subtaskId
+              ? { ...subtask, completed: !subtask.completed }
+              : subtask,
+          ),
+        }
+      }),
+    )
+  }
+
+  // 初期状態に戻す: コンソールを使わずにダミー6件へ戻す。編集・分割・
+  // 完了の内容は消える（localStorage を消してリロードしたのと同じ結果）
+  const handleReset = () => {
+    setTasks(createInitialTasks(todayKey))
+    setEditingId(null)
+    setEditingTitle('')
+    setConfirmingReset(false)
   }
 
   return (
     <main className="page">
-      <h1>今日の予定</h1>
+      <h1>今日のタスク</h1>
 
       <div className="today-progress">
         <p className="today-progress-text">
@@ -269,20 +646,65 @@ export default function TodayPage() {
       </div>
 
       {todayTasks.length === 0 ? (
-        <p>今日の予定はありません</p>
+        <p>今日のタスクはありません</p>
       ) : (
         <ul className="today-list">
-          {todayTasks.map((task) => (
+          {displayTasks.map((task) => (
             <TaskRow
               key={task.id}
               task={task}
+              isEditing={editingId === task.id}
+              editingTitle={editingId === task.id ? editingTitle : ''}
               onToggle={handleToggle}
-              onEdit={handleEdit}
+              onEditStart={startEdit}
+              onEditChange={setEditingTitle}
+              onEditSave={saveEdit}
+              onEditCancel={cancelEdit}
               onDelete={handleDelete}
+              onDeadlineChange={handleDeadlineChange}
+              onSplit={handleSplit}
+              onSubtaskToggle={handleSubtaskToggle}
+              onSubtaskRename={handleSubtaskRename}
+              onSubtaskDelete={handleSubtaskDelete}
+              onSubtaskAdd={handleSubtaskAdd}
             />
           ))}
         </ul>
       )}
+
+      <div className="today-reset-area">
+        {confirmingReset ? (
+          <p className="today-reset-confirm">
+            初期の6件に戻しますか？ 編集・分割・完了の内容は消えます。
+            <span className="today-actions">
+              <button
+                type="button"
+                className="ui-button today-small-button"
+                aria-label="初期の6件に戻す"
+                onClick={handleReset}
+              >
+                戻す
+              </button>
+              <button
+                type="button"
+                className="ui-button today-small-button"
+                onClick={() => setConfirmingReset(false)}
+              >
+                キャンセル
+              </button>
+            </span>
+          </p>
+        ) : (
+          <button
+            type="button"
+            className="ui-button today-small-button"
+            aria-label="タスクを初期状態に戻す"
+            onClick={() => setConfirmingReset(true)}
+          >
+            初期状態に戻す
+          </button>
+        )}
+      </div>
 
       <PraiseModal
         open={praiseMessage !== null}
